@@ -66,6 +66,9 @@ class FreeTrip extends Trip{
         super(id,name,imageUrl);
         this.price=0;
     }
+    toString(){
+        return `Free${super.toString()}`;
+    }
 }
 let freeTrip= new FreeTrip('nantes','Nantes','img/nantes.jpg');
 console.log(freeTrip.toString());
@@ -82,7 +85,7 @@ class TripService {
     findByName(tripName) {
         return new Promise((resolve, reject) => {
         setTimeout( () => {
-        for(const t in this.tripSet){
+        for(const t of this.tripSet){
             if(t.name===tripName){
                 resolve(t);
             }
@@ -92,12 +95,6 @@ class TripService {
     });
     }
 }
-
-let tripService = new TripService();
-tripService.findByName('Nantes')
-.then(tripFound => console.log('Trip found ',tripFound))
-.catch(err => console.log(err));
-
 
 class PriceService {
     constructor() {
@@ -115,13 +112,29 @@ class PriceService {
                         resolve(this.tripMap.get(t).price);
                     }
                 }
-                        reject(`No trip with name ${tripId} found.`);
+                        reject(`No price for the trip id ${tripId}.`);
             }, 2000)
         });
     }
 }
-
+let tripService = new TripService();
 let priceService = new PriceService();
-priceService.findPriceByTripId('paris')
-.then(priceFound => console.log('Price found', priceFound))
+tripService.findByName('Paris')
+.then(tripFound => console.log('Trip found : ',tripFound))
+.catch(err => console.log(err));
+
+tripService.findByName('Toulouse')
+.then(tripFound => console.log('Trip found : ',tripFound))
+.catch(err => console.log(err));
+
+tripService.findByName('Rio de Janeiro')
+.then(tripFound => tripFound.id)
+.then(tripFoundId =>priceService.findPriceByTripId(tripFoundId))
+.then(price => console.log(`Price found : ${price}`))
+.catch(err => console.log(err));
+
+tripService.findByName('Nantes')
+.then(tripFound => tripFound.id)
+.then(tripFoundId =>priceService.findPriceByTripId(tripFoundId))
+.then(price => console.log(`Price found ${price}`))
 .catch(err => console.log(err));
